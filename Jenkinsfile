@@ -7,7 +7,14 @@ pipeline {
         DOCKER_IMAGE_NAME = 'my-app'
         DOCKER_IMAGE_TAG = 'latest'
     }
-    
+
+    stages {
+        stage('git clone') {
+            steps {
+                echo 'Hello World'
+                git credentialsId: 'jenkins', url: 'https://github.com/shubh0013/maven-project.git'
+            }
+        }
         stage('build') {
             steps {
                 echo 'Hello, this is the build stage'
