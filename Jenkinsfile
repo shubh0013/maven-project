@@ -1,34 +1,44 @@
 pipeline {
     agent any
-    
+
     environment {
         MAVEN_HOME = tool name: 'maven', type: 'maven'
+        DOCKER_REGISTRY = 'docker.io' // Replace with your Docker Hub registry URL
+        DOCKER_IMAGE_NAME = 'my-app'
+        DOCKER_IMAGE_TAG = 'latest'
     }
-
-    stages {
-        
+    
         stage('build') {
             steps {
-                echo 'Hello this is second stage build '
-                sh "${MAVEN_HOME}/bin/mvn clean"
-                //bat
-                
+                echo 'Hello, this is the build stage'
+                sh "${MAVEN_HOME}/bin/mvn clean install"
             }
         }
-        stage('test') {
+        stage('create docker image') {
             steps {
-                echo 'Hello this is second stage build '
-                sh "${MAVEN_HOME}/bin/mvn test"
-                //bat
-                
+                echo 'Creating Docker image'
+                script {
+                    def dockerImage = docker.build("${DOCKER_REGISTRY}/${DOCKER_IMAGE_NAME}:${DOCKER_IMAGE_TAG}", "-f Dockerfile .")
+                }
             }
         }
-        stage('install') {
+        stage('push to Docker Hub') {
             steps {
-                echo 'Hello this is second stage build '
-                sh "${MAVEN_HOME}/bin/mvn install"
-                //bat
-                
+                echo 'Pushing Docker image to Docker Hub'
+                script {
+                    docker.withRegistry("${DOCKER_REGISTRY}", 'docker-hub-credentials') {
+                        def dockerImage = docker.image("${DOCKER_REGISTRY}/${DOCKER_IMAGE_NAME}:${DOCKER_IMAGE_TAG}")
+                        dockerImage.push()
+                    }
+                }
+            }
+        }
+        stage('deploy to Docker') {
+            steps {
+                echo 'Deploying to Docker'
+                script {
+                    docker.run("${DOCKER_REGISTRY}/${DOCKER_IMAGE_NAME}:${DOCKER_IMAGE_TAG}")
+                }
             }
         }
     }
