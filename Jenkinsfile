@@ -3,7 +3,7 @@ pipeline {
 
     environment {
         MAVEN_HOME = tool name: 'maven', type: 'maven'
-        DOCKER_REGISTRY = 'docker.io' // Replace with your Docker Hub registry URL
+        DOCKER_HOME = tool name: 'docker', type: 'DockerTool' // Define Docker tool here
         DOCKER_IMAGE_NAME = 'my-app'
         DOCKER_IMAGE_TAG = 'latest'
     }
@@ -24,28 +24,13 @@ pipeline {
         stage('create docker image') {
             steps {
                 echo 'Creating Docker image'
-                script {
-                    def dockerImage = docker.build("${DOCKER_REGISTRY}/${DOCKER_IMAGE_NAME}:${DOCKER_IMAGE_TAG}", "-f Dockerfile .")
-                }
+                sh "${DOCKER_HOME}/docker build -t ${DOCKER_IMAGE_NAME}:${DOCKER_IMAGE_TAG} -f Dockerfile ."
             }
         }
         stage('push to Docker Hub') {
             steps {
                 echo 'Pushing Docker image to Docker Hub'
-                script {
-                    docker.withRegistry("${DOCKER_REGISTRY}", 'docker-hub-credentials') {
-                        def dockerImage = docker.image("${DOCKER_REGISTRY}/${DOCKER_IMAGE_NAME}:${DOCKER_IMAGE_TAG}")
-                        dockerImage.push()
-                    }
-                }
-            }
-        }
-        stage('deploy to Docker') {
-            steps {
-                echo 'Deploying to Docker'
-                script {
-                    docker.run("${DOCKER_REGISTRY}/${DOCKER_IMAGE_NAME}:${DOCKER_IMAGE_TAG}")
-                }
+                sh "${DOCKER_HOME}/docker push ${DOCKER_IMAGE_NAME}:${DOCKER_IMAGE_TAG}"
             }
         }
     }
