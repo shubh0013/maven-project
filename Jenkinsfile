@@ -24,7 +24,8 @@ pipeline {
         stage('create docker image') {
             steps {
                 echo 'Creating Docker image'
-               // docker.build .
+                docker --version
+                docker build -t ${DOCKER_IMAGE_NAME}:${DOCKER_IMAGE_TAG} -f Dockerfile ."
             }
         }
         stage('push to Docker Hub') {
