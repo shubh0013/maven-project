@@ -26,9 +26,9 @@ pipeline {
         stage('docker build') {
             steps {
                 echo 'creating docker image '
-                sh 'docker build -t '${DOCKER_IMAGE_NAME}:${DOCKER_IMAGE_TAG} -f Dockerfile .'
+                sh 'docker build -t ${DOCKER_IMAGE_NAME}:${DOCKER_IMAGE_TAG} -f Dockerfile .'
                 //bat
-                
+            
             }
         }
     }
