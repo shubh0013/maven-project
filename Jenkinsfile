@@ -18,13 +18,13 @@ pipeline {
         stage('build') {
             steps {
                 echo 'Hello, this is the build stage'
-                sh "${MAVEN_HOME}/bin/mvn clean install"
+                sh "${MAVEN_HOME}/bin/mvn clean package"
             }
         }
         stage('create docker image') {
             steps {
                 echo 'Creating Docker image'
-                sh "${DOCKER_HOME}/docker build -t ${DOCKER_IMAGE_NAME}:${DOCKER_IMAGE_TAG} -f Dockerfile ."
+                docker.build .
             }
         }
         stage('push to Docker Hub') {
