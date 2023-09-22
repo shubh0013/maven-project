@@ -3,6 +3,8 @@ pipeline {
     
     environment {
         MAVEN_HOME = tool name: 'maven', type: 'maven'
+        DOCKER_IMAGE_NAME = 'shubh0013/my_app'
+        DOCKER_IMAGE_TAG = "latest-${BUILD_NUMBER}" // jenkins build no for tag
     }
 
     stages {
@@ -15,15 +17,16 @@ pipeline {
         stage('build') {
             steps {
                 echo 'Hello this is second stage build '
-                sh "${MAVEN_HOME}/bin/mvn clean"
+                sh "${MAVEN_HOME}/bin/mvn clean package"
                 //bat
                 
             }
         }
-        stage('test') {
+    
+        stage('docker build') {
             steps {
-                echo 'Hello this is second stage build '
-                sh "${MAVEN_HOME}/bin/mvn test"
+                echo 'creating docker image '
+                sh 'docker build -t '${DOCKER_IMAGE_NAME}:${DOCKER_IMAGE_TAG} -f Dockerfile .
                 //bat
                 
             }
