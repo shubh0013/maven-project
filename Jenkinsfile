@@ -24,7 +24,7 @@ pipeline {
         stage('create docker image') {
             steps {
                 echo 'Creating Docker image'
-                docker.build .
+               // docker.build .
             }
         }
         stage('push to Docker Hub') {
