@@ -3,9 +3,9 @@ pipeline {
 
     environment {
         MAVEN_HOME = tool name: 'maven', type: 'maven'
-        DOCKER_HOME = tool name: 'docker', type: 'DockerTool' // Define Docker tool here
-        DOCKER_IMAGE_NAME = 'my-app'
-        DOCKER_IMAGE_TAG = 'latest'
+        DOCKER_IMAGE_NAME = 'shubh0013/my-app'
+        DOCKER_IMAGE_TAG = "latest-${BUILD_NUMBER}"
+        DOCKERHUB_CREDENTIALS = credentials('shubh0013-dockerhub')
     }
 
     stages {
@@ -23,17 +23,18 @@ pipeline {
         }
         stage('create docker image') {
             steps {
-                script{
                 echo 'Creating Docker image'
-                docker --version
-                docker build -t ${DOCKER_IMAGE_NAME}:${DOCKER_IMAGE_TAG} -f Dockerfile ."
-                }
+                sh 'docker --version'
+                sh "docker build -t ${DOCKER_IMAGE_NAME}:${DOCKER_IMAGE_TAG} -f Dockerfile ."
             }
         }
         stage('push to Docker Hub') {
             steps {
                 echo 'Pushing Docker image to Docker Hub'
-                sh "${DOCKER_HOME}/docker push ${DOCKER_IMAGE_NAME}:${DOCKER_IMAGE_TAG}"
+                //sh "echo \${DOCKERHUB_CREDENTIALS_PSW} | docker login -u \${DOCKERHUB_CREDENTIALS_USR} --password-stdin"
+                withDockerRegistry(credentialsId: 'shubh0013-dockerhub', url: 'https://index.docker.io/v1/') {
+                    sh "docker push ${DOCKER_IMAGE_NAME}:${DOCKER_IMAGE_TAG}"
+                }
             }
         }
     }
