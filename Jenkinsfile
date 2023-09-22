@@ -3,6 +3,8 @@ pipeline {
     
     environment {
         MAVEN_HOME = tool name: 'maven', type: 'maven'
+        DOCKER_IMAGENAME = shubh0013/my-app
+        DOCKER_TAG = latest
     }
 
     stages {
@@ -24,6 +26,14 @@ pipeline {
             steps {
                 echo 'Hello this is second stage build '
                 sh "${MAVEN_HOME}/bin/mvn test"
+                //bat
+                
+            }
+
+        stage('creating docker image') {
+            steps {
+                echo 'creation of docker image '
+                sh "docker --version" 
                 //bat
                 
             }
